@@ -4,15 +4,18 @@ import (
 	"bytes"
 )
 
-type Chapter struct {
-	Title string
-	Text  string
+type PTitle struct {
+	Text string
+}
+
+type PText struct {
+	Text string
 }
 
 type Md struct {
 	TitleInfo   string
 	Description string
-	Chapters    []Chapter
+	Paragraphs  []interface{}
 }
 
 func (md *Md) SetTitle(title string) {
@@ -23,11 +26,12 @@ func (md *Md) SetAnnotation(annotation string) {
 	md.Description = annotation
 }
 
-func (md *Md) AppendChapter(title, text string) {
-	md.Chapters = append(md.Chapters, Chapter{
-		Title: title,
-		Text:  text,
-	})
+func (md *Md) AppendTitle(title string) {
+	md.Paragraphs = append(md.Paragraphs, PTitle{title})
+}
+
+func (md *Md) AppendText(text string) {
+	md.Paragraphs = append(md.Paragraphs, PText{text})
 }
 
 func (md Md) Bytes() []byte {
@@ -38,12 +42,12 @@ func (md Md) Bytes() []byte {
 	if md.Description != "" {
 		buffer.WriteString(md.Description + "\n\n")
 	}
-	for _, chapter := range md.Chapters {
-		if chapter.Title != "" {
-			buffer.WriteString("## " + chapter.Title + "\n\n")
+	for _, paragraph := range md.Paragraphs {
+		if v, ok := paragraph.(PTitle); ok {
+			buffer.WriteString("## " + v.Text + "\n\n")
 		}
-		if chapter.Text != "" {
-			buffer.WriteString(chapter.Text + "\n\n")
+		if v, ok := paragraph.(PText); ok {
+			buffer.WriteString(v.Text + "\n\n")
 		}
 	}
 	return buffer.Bytes()
@@ -53,9 +57,13 @@ func (md Md) String() string {
 	return string(md.Bytes())
 }
 
-func Init(title, annotation string) *Md {
+func InitWithTitle(title, annotation string) *Md {
 	return &Md{
 		TitleInfo:   title,
 		Description: annotation,
 	}
+}
+
+func Init() *Md {
+	return &Md{}
 }

@@ -3,7 +3,8 @@ package output
 type OutputFormat interface {
 	SetTitle(title string)
 	SetAnnotation(annotation string)
-	AppendChapter(title, text string)
+	AppendTitle(title string)
+	AppendText(text string)
 	String() string
 	Bytes() []byte
 }

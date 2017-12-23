@@ -16,7 +16,11 @@ func (txt *Txt) SetAnnotation(annotation string) {
 	txt.Paragraphs = append(txt.Paragraphs, annotation)
 }
 
-func (txt *Txt) AppendChapter(_, text string) {
+func (txt *Txt) AppendTitle(title string) {
+	txt.Paragraphs = append(txt.Paragraphs, title)
+}
+
+func (txt *Txt) AppendText(text string) {
 	txt.Paragraphs = append(txt.Paragraphs, text)
 }
 
@@ -37,6 +41,10 @@ func (txt Txt) String() string {
 	return string(txt.Bytes())
 }
 
-func Init(title, annotation string) *Txt {
+func InitWithTitle(title string) *Txt {
 	return &Txt{Title: title}
+}
+
+func Init() *Txt {
+	return &Txt{}
 }

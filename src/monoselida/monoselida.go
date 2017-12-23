@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"regexp"
+	"strconv"
 	"strings"
 
 	"monoselida/fb2"
@@ -25,15 +26,12 @@ func FromLocal(localPath, savePath string, config Config) {
 }
 
 //FromWeb makes web site offline for future read
-func FromWeb(urlBase string, lastPage int, savePath string) {
-	//fixme tune it in
-	/*
-		var buffer bytes.Buffer
-		for i := 1; i <= lastPage; i++ {
-			procPage(urlBase+strconv.Itoa(i), &buffer)
-		}
-		saveResult(savePath, buffer.Bytes())
-	*/
+func FromWeb(urlBase, savePath string, firstPage, lastPage int, config Config) {
+	out := GetOutput(savePath)
+	for i := firstPage; i <= lastPage; i++ {
+		procPageRules(urlBase+strconv.Itoa(i), out, config)
+	}
+	saveResult(savePath, out.Bytes())
 }
 
 //GetOutput return instance of output interface
@@ -41,11 +39,11 @@ func FromWeb(urlBase string, lastPage int, savePath string) {
 func GetOutput(savePath string) output.OutputFormat {
 	var out output.OutputFormat
 	if strings.HasSuffix(savePath, ".fb2") {
-		out = fb2.Init("", "")
+		out = fb2.Init()
 	} else if strings.HasSuffix(savePath, ".md") {
-		out = md.Init("", "")
+		out = md.Init()
 	} else if strings.HasSuffix(savePath, ".txt") {
-		out = txt.Init("", "")
+		out = txt.Init()
 	}
 	return out
 }
@@ -130,16 +128,24 @@ func readLayer(xmlroot *xmlpath.Node, buffer output.OutputFormat, config Config)
 		iter := path.Iter(xmlroot)
 		for iter.Next() {
 			node := iter.Node()
-			if config.UseText {
-				buffer.AppendChapter("", sanitize(node.String()))
-			}
+			textToOutput(buffer, config, node.String())
 			for _, conf := range config.Configs {
 				readLayer(node, buffer, conf)
 			}
 		}
 	} else {
-		if content, ok := path.String(xmlroot); ok && config.UseText {
-			buffer.AppendChapter("", sanitize(content))
+		if content, ok := path.String(xmlroot); ok {
+			textToOutput(buffer, config, content)
+		}
+	}
+}
+
+func textToOutput(buffer output.OutputFormat, config Config, text string) {
+	if !config.IgnoreText {
+		if config.IsTitle {
+			buffer.AppendTitle(sanitize(text))
+		} else {
+			buffer.AppendText(sanitize(text))
 		}
 	}
 }

@@ -8,28 +8,23 @@ import (
 
 type TitleInfo struct {
 	XMLName    xml.Name `xml:"title-info"`
-	BookTitle  string   `xml:"book-title"`
-	Annotation string   `xml:"annotation"`
+	BookTitle  string   `xml:"book-title,omitempty"`
+	Annotation string   `xml:"annotation,omitempty"`
 }
 
 type Description struct {
-	XMLName   xml.Name `xml:"description"`
-	TitleInfo TitleInfo
+	XMLName   xml.Name  `xml:"description,omitempty"`
+	TitleInfo TitleInfo `xml:",omitempty"`
 }
 
 type Title struct {
-	XMLName xml.Name `xml:"title"`
+	XMLName xml.Name `xml:"title,omitempty"`
 	P       string   `xml:"p"`
 }
 
-type Chapter struct {
-	Title Title
-	P     string `xml:"p"`
-}
-
 type Section struct {
-	XMLName  xml.Name `xml:"section"`
-	Chapters []Chapter
+	XMLName    xml.Name      `xml:"section"`
+	Paragraphs []interface{} `xml:"p"`
 }
 
 type Body struct {
@@ -56,7 +51,7 @@ func (f FB2) Bytes() []byte {
 	return bytes.NewBuffer(data).Bytes()
 }
 
-func (f *FB2) SetTitle(title string) {
+func (f *FB2) SetTitle(title string) { //fixme book title vs title
 	f.Description.TitleInfo.BookTitle = title
 }
 
@@ -64,15 +59,15 @@ func (f *FB2) SetAnnotation(annotation string) {
 	f.Description.TitleInfo.Annotation = annotation
 }
 
-func (f *FB2) AppendChapter(title, text string) {
-	f.Body.Section.Chapters = append(f.Body.Section.Chapters,
-		Chapter{
-			Title: Title{P: title},
-			P:     text,
-		})
+func (f *FB2) AppendTitle(title string) {
+	f.Body.Section.Paragraphs = append(f.Body.Section.Paragraphs, Title{P: title})
 }
 
-func Init(title, annotation string) *FB2 {
+func (f *FB2) AppendText(text string) {
+	f.Body.Section.Paragraphs = append(f.Body.Section.Paragraphs, text)
+}
+
+func InitWithTitle(title, annotation string) *FB2 {
 	return &FB2{
 		XLink: "http://www.w3.org/1999/xlink",
 		Description: Description{
@@ -82,4 +77,8 @@ func Init(title, annotation string) *FB2 {
 			},
 		},
 	}
+}
+
+func Init() *FB2 {
+	return InitWithTitle("", "")
 }

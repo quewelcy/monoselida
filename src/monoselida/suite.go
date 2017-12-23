@@ -7,10 +7,11 @@ import (
 )
 
 type Config struct {
-	Rule    string
-	Repeat  bool
-	UseText bool
-	Configs []Config
+	Rule       string
+	Repeat     bool
+	IgnoreText bool
+	IsTitle    bool
+	Configs    []Config
 }
 
 func ProcessSuite(suiteDef []byte) Config {

@@ -1,9 +1,8 @@
 rule: //div[@class='product_card']
 repeat: true
-usetext: false
+ignoretext: true
 configs:
+  - rule: .//a[@class='name']
+    istitle: true
   - rule: .//div[@class='image']/a/@href
-    usetext: true
   - rule: .//div[@class='grey-block']/p[@class='price']
-    usetext: true
-  - rule: .//div[@class='name']
