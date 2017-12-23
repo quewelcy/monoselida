@@ -110,6 +110,7 @@ func readWeb(path string) ([]byte, error) {
 	return bytes, nil
 }
 
+//ReadLocal read byte array from file located at input path
 func ReadLocal(path string) ([]byte, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {

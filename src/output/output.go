@@ -1,7 +1,7 @@
 package output
 
 type OutputFormat interface {
-	SetTitle(title string)
+	SetBookTitle(title string)
 	SetAnnotation(annotation string)
 	AppendTitle(title string)
 	AppendText(text string)
