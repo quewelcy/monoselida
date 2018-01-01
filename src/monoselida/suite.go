@@ -14,6 +14,7 @@ import (
 //Configs enclosed configs
 type Config struct {
 	Rule       string
+	NextPage   string
 	Repeat     bool
 	IgnoreText bool
 	IsTitle    bool

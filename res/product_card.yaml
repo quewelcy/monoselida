@@ -1,6 +1,7 @@
 rule: //div[@class='product_card']
 repeat: true
 ignoretext: true
+nextpage: //div[@class='pagination']/div[@class='links']/a/@href
 configs:
   - rule: .//a[@class='name']
     istitle: true

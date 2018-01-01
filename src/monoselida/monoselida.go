@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"monoselida/fb2"
@@ -18,20 +17,14 @@ import (
 	xmlpath "gopkg.in/xmlpath.v2"
 )
 
-//FromLocal makes parsing of local file
-func FromLocal(localPath, savePath string, config Config) {
-	out := GetOutput(savePath)
-	procPageRules(localPath, out, config)
-	saveResult(savePath, out.Bytes())
-}
-
-//FromWeb makes web site offline for future read
-func FromWeb(urlBase, savePath string, firstPage, lastPage int, config Config) {
-	out := GetOutput(savePath)
-	for i := firstPage; i <= lastPage; i++ {
-		procPageRules(urlBase+strconv.Itoa(i), out, config)
-	}
-	saveResult(savePath, out.Bytes())
+//Start entry point for Monoselida, takes locations of
+//target page, save and config to apply to target page
+func Start(readFromPath, saveToPath, configPath string) {
+	configBytes, _ := readLocal(configPath)
+	out := GetOutput(saveToPath)
+	config := ProcessSuite(configBytes)
+	procPageRules(readFromPath, out, config)
+	saveResult(saveToPath, out.Bytes())
 }
 
 //GetOutput return instance of output interface
@@ -71,7 +64,7 @@ func readFixedHTML(url string) (*xmlpath.Node, error) {
 	if strings.HasPrefix(url, "http") {
 		content, err = readWeb(url)
 	} else {
-		content, err = ReadLocal(url)
+		content, err = readLocal(url)
 	}
 	if err != nil {
 		return nil, err
@@ -110,8 +103,8 @@ func readWeb(path string) ([]byte, error) {
 	return bytes, nil
 }
 
-//ReadLocal read byte array from file located at input path
-func ReadLocal(path string) ([]byte, error) {
+//readLocal read byte array from file located at input path
+func readLocal(path string) ([]byte, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Fatal(err)
@@ -120,7 +113,7 @@ func ReadLocal(path string) ([]byte, error) {
 	return data, nil
 }
 
-func readLayer(xmlroot *xmlpath.Node, buffer output.OutputFormat, config Config) {
+func readLayer(xmlroot *xmlpath.Node, out output.OutputFormat, config Config) {
 	if config.Rule == "" {
 		return
 	}
@@ -129,14 +122,20 @@ func readLayer(xmlroot *xmlpath.Node, buffer output.OutputFormat, config Config)
 		iter := path.Iter(xmlroot)
 		for iter.Next() {
 			node := iter.Node()
-			textToOutput(buffer, config, node.String())
+			textToOutput(out, config, node.String())
 			for _, conf := range config.Configs {
-				readLayer(node, buffer, conf)
+				readLayer(node, out, conf)
 			}
 		}
 	} else {
 		if content, ok := path.String(xmlroot); ok {
-			textToOutput(buffer, config, content)
+			textToOutput(out, config, content)
+		}
+	}
+	if config.NextPage != "" {
+		nextPath := xmlpath.MustCompile(config.NextPage)
+		if link, ok := nextPath.String(xmlroot); ok {
+			procPageRules(link, out, config)
 		}
 	}
 }
