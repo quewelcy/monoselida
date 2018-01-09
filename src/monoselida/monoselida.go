@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"monoselida/csv"
 	"monoselida/fb2"
 	"monoselida/md"
 	"monoselida/txt"
@@ -37,6 +38,8 @@ func GetOutput(savePath string) output.OutputFormat {
 		out = md.Init()
 	} else if strings.HasSuffix(savePath, ".txt") {
 		out = txt.Init()
+	} else if strings.HasSuffix(savePath, ".csv") {
+		out = csv.Init()
 	}
 	return out
 }

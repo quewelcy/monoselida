@@ -7,3 +7,8 @@ configs:
     istitle: true
   - rule: .//div[@class='image']/a/@href
   - rule: .//div[@class='grey-block']/p[@class='price']
+  - rule: .//ul[@class='product-ocfilter-options']/li[1]//span[@class='product-ocfilter-value']
+  - rule: .//ul[@class='product-ocfilter-options']/li[2]//span[@class='product-ocfilter-value']
+  - rule: .//ul[@class='product-ocfilter-options']/li[3]//span[@class='product-ocfilter-value']
+  - rule: .//ul[@class='product-ocfilter-options']/li[5]//span[@class='product-ocfilter-value']
+  - rule: .//ul[@class='product-ocfilter-options']/li[6]//span[@class='product-ocfilter-value']
