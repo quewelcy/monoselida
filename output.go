@@ -1,5 +1,6 @@
-package output
+package main
 
+//OutputFormat output format
 type OutputFormat interface {
 	SetBookTitle(title string)
 	SetAnnotation(annotation string)

@@ -1,4 +1,4 @@
-package fb2
+package main
 
 import (
 	"bytes"
@@ -83,7 +83,7 @@ func (f *FB2) AppendText(text string) {
 }
 
 //InitWithTitle inits FB2 output with title and annotation
-func InitWithTitle(title, annotation string) *FB2 {
+func fb2InitWithTitle(title, annotation string) *FB2 {
 	return &FB2{
 		XLink: "http://www.w3.org/1999/xlink",
 		Description: Description{
@@ -96,6 +96,6 @@ func InitWithTitle(title, annotation string) *FB2 {
 }
 
 //Init inits empty FB2 output
-func Init() *FB2 {
-	return InitWithTitle("", "")
+func fb2Init() *FB2 {
+	return fb2InitWithTitle("", "")
 }

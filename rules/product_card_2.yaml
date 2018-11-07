@@ -1,0 +1,14 @@
+rule: //div[@class='product_card']
+repeat: true
+ignoretext: true
+nextpage: //div[@class='pagination']/div[@class='links']/b/following-sibling::a/@href
+configs:
+  - rule: ./a[1]
+    istitle: true
+  - rule: ./a[1]/@href
+  - rule: .//div[1]/p[@class='price']
+  - rule: .//div[1]/p[2]/span[1]
+  - rule: .//div[1]/p[2]/span[2]
+  - rule: .//div[1]/p[2]/span[3]
+  - rule: .//div[1]/p[2]/span[4]
+  - rule: .//div[1]/p[2]/span[5]

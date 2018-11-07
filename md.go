@@ -1,4 +1,4 @@
-package md
+package main
 
 import (
 	"bytes"
@@ -67,7 +67,7 @@ func (md Md) String() string {
 }
 
 //InitWithTitle inits markdown file with title and annotation
-func InitWithTitle(title, annotation string) *Md {
+func mdInitWithTitle(title, annotation string) *Md {
 	return &Md{
 		TitleInfo:   title,
 		Description: annotation,
@@ -75,6 +75,6 @@ func InitWithTitle(title, annotation string) *Md {
 }
 
 //Init inits empty markdown file
-func Init() *Md {
+func mdInit() *Md {
 	return &Md{}
 }

@@ -1,4 +1,4 @@
-package monoselida
+package main
 
 import (
 	"log"

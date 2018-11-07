@@ -1,4 +1,4 @@
-package txt
+package main
 
 import (
 	"bytes"
@@ -50,11 +50,11 @@ func (txt Txt) String() string {
 }
 
 //InitWithTitle inits txt file with title
-func InitWithTitle(title string) *Txt {
+func txtInitWithTitle(title string) *Txt {
 	return &Txt{Title: title}
 }
 
 //Init inits empty txt file
-func Init() *Txt {
+func txtInit() *Txt {
 	return &Txt{}
 }

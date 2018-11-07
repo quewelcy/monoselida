@@ -1,26 +1,31 @@
-package monoselida
+package main
 
 import (
 	"bytes"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
-
-	"monoselida/csv"
-	"monoselida/fb2"
-	"monoselida/md"
-	"monoselida/txt"
-	"output"
 
 	"golang.org/x/net/html"
 	xmlpath "gopkg.in/xmlpath.v2"
 )
 
+func main() {
+	if len(os.Args) < 4 {
+		log.Fatal(`Not enough arguments. Must be provided
+			1. Path to read from
+			2. Path to save result
+			3. Path to rules.yaml file`)
+	}
+	start(os.Args[1], os.Args[2], os.Args[3])
+}
+
 //Start entry point for Monoselida, takes locations of
 //target page, save and config to apply to target page
-func Start(readFromPath, saveToPath, configPath string) {
+func start(readFromPath, saveToPath, configPath string) {
 	configBytes, _ := readLocal(configPath)
 	out := GetOutput(saveToPath)
 	config := ProcessSuite(configBytes)
@@ -30,16 +35,16 @@ func Start(readFromPath, saveToPath, configPath string) {
 
 //GetOutput return instance of output interface
 //depending on file extention
-func GetOutput(savePath string) output.OutputFormat {
-	var out output.OutputFormat
+func GetOutput(savePath string) OutputFormat {
+	var out OutputFormat
 	if strings.HasSuffix(savePath, ".fb2") {
-		out = fb2.Init()
+		out = fb2Init()
 	} else if strings.HasSuffix(savePath, ".md") {
-		out = md.Init()
+		out = mdInit()
 	} else if strings.HasSuffix(savePath, ".txt") {
-		out = txt.Init()
+		out = txtInit()
 	} else if strings.HasSuffix(savePath, ".csv") {
-		out = csv.Init()
+		out = csvInit()
 	}
 	return out
 }
@@ -49,9 +54,10 @@ func saveResult(savePath string, bytes []byte) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Written into", savePath)
 }
 
-func procPageRules(url string, buffer output.OutputFormat, config Config) {
+func procPageRules(url string, buffer OutputFormat, config Config) {
 	log.Println("Processing page", url)
 	xmlroot, err := readFixedHTML(url)
 	if err != nil {
@@ -106,7 +112,6 @@ func readWeb(path string) ([]byte, error) {
 	return bytes, nil
 }
 
-//readLocal read byte array from file located at input path
 func readLocal(path string) ([]byte, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -116,7 +121,7 @@ func readLocal(path string) ([]byte, error) {
 	return data, nil
 }
 
-func readLayer(xmlroot *xmlpath.Node, out output.OutputFormat, config Config) {
+func readLayer(xmlroot *xmlpath.Node, out OutputFormat, config Config) {
 	if config.Rule == "" {
 		return
 	}
@@ -143,7 +148,7 @@ func readLayer(xmlroot *xmlpath.Node, out output.OutputFormat, config Config) {
 	}
 }
 
-func textToOutput(buffer output.OutputFormat, config Config, text string) {
+func textToOutput(buffer OutputFormat, config Config, text string) {
 	if !config.IgnoreText {
 		if config.IsTitle {
 			buffer.AppendTitle(sanitize(text))

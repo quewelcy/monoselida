@@ -1,4 +1,4 @@
-package csv
+package main
 
 import (
 	"bytes"
@@ -48,11 +48,11 @@ func (csv Csv) String() string {
 }
 
 //InitWithTitle inits csv file with title
-func InitWithTitle(title string) *Csv {
+func csvInitWithTitle(title string) *Csv {
 	return &Csv{}
 }
 
 //Init inits empty csv file
-func Init() *Csv {
+func csvInit() *Csv {
 	return &Csv{}
 }
